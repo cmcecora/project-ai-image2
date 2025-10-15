@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI or Not? - Complete Project Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            color: #764ba2;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        nav {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        nav h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #764ba2;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #764ba2;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            color: #666;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .architecture {
+            background: #f8f8f8;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .flow-diagram {
+            background: #f0f8ff;
+            border: 2px solid #4169e1;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight {
+            background: #fffacd;
+            padding: 15px;
+            border-left: 4px solid #ffd700;
+            margin: 20px 0;
+        }
+
+        .star {
+            color: #ffd700;
+        }
+
+        strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav a {
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI or Not? - Complete Project Documentation</h1>
+            <p>A comprehensive guide containing all project documentation in a single file</p>
+        </header>
+
+        <nav>
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#prd">Product Requirements</a></li>
+                <li><a href="#tech-stack">Technical Stack</a></li>
+                <li><a href="#user-stories">User Stories</a></li>
+                <li><a href="#user-flows">User Flows</a></li>
+                <li><a href="#api-research">API Research</a></li>
+            </ul>
+        </nav>
+
+        <div id="prd" class="section">
+            <h1>Product Requirements Document (PRD)</h1>
+
+            <h2>1. Executive Summary</h2>
+
+            <h3>Product Name: AI or Not? - The Ultimate Image Detection Game</h3>
+
+            <h4>Vision Statement</h4>
+            <p>Create an engaging, educational, and monetizable web game that challenges users to distinguish between AI-generated and real photographs, while building awareness about the advancing capabilities of AI image generation.</p>
+
+            <h4>Problem Statement</h4>
+            <p>With the rapid advancement of AI image generation technology, it's becoming increasingly difficult to distinguish between real and AI-generated images. This creates both educational opportunities and potential risks for digital literacy.</p>
+
+            <h4>Solution</h4>
+            <p>An interactive, gamified platform that:</p>
+            <ul>
+                <li>Tests users' ability to identify AI-generated images</li>
+                <li>Provides immediate feedback and educational insights</li>
+                <li>Tracks performance and creates competitive engagement through scoring</li>
+                <li>Monetizes through strategic ad placement</li>
+            </ul>
+
+            <h2>2. Core Features & Functionality</h2>
+
+            <h3>2.1 Primary Game Loop</h3>
+            <ul>
+                <li><strong>Image Display</strong>: Large, centered image presentation</li>
+                <li><strong>Binary Choice Interface</strong>: Prominent "AI" and "Not AI" buttons</li>
+                <li><strong>Instant Feedback</strong>: Results page showing:
+                    <ul>
+                        <li>Correct answer</li>
+                        <li>Community voting percentages</li>
+                        <li>Total votes</li>
+                        <li>Image source and credits</li>
+                        <li>User's current score</li>
+                        <li>Running statistics (correct/incorrect)</li>
+                    </ul>
+                </li>
+                <li><strong>Continuous Play</strong>: "Next" button to load new challenge without page reload</li>
+            </ul>
+
+            <h3>2.2 Gamification Elements</h3>
+            <ul>
+                <li><strong>Persistent Scoring</strong>: Track lifetime statistics using localStorage</li>
+                <li><strong>Leaderboard</strong>: Global rankings showing top performers</li>
+                <li><strong>Streak Tracking</strong>: Consecutive correct answers</li>
+                <li><strong>Achievement System</strong>: Milestones for accuracy and volume</li>
+            </ul>
+
+            <h3>2.3 Mobile Experience</h3>
+            <ul>
+                <li><strong>Responsive Design</strong>: Optimized layouts for all screen sizes</li>
+                <li><strong>Swipe Gestures</strong>: Left swipe for "Not AI", Right swipe for "AI"</li>
+                <li><strong>Touch-Optimized</strong>: Large, thumb-friendly interaction areas</li>
+            </ul>
+
+            <h3>2.4 Monetization</h3>
+            <ul>
+                <li><strong>Display Advertising</strong>: 4 strategic banner placements
+                    <ul>
+                        <li>Top banner (728x90 leaderboard)</li>
+                        <li>Bottom banner (728x90 leaderboard)</li>
+                        <li>Left sidebar (160x600 skyscraper)</li>
+                        <li>Right sidebar (160x600 skyscraper)</li>
+                    </ul>
+                </li>
+                <li><strong>High-quality ad network integration</strong> (Google AdSense recommended)</li>
+            </ul>
+
+            <h2>3. Success Metrics</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Metric</th>
+                        <th>Target</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="4">Engagement</td>
+                        <td>Daily Active Users (DAU)</td>
+                        <td>1000+</td>
+                    </tr>
+                    <tr>
+                        <td>Average Session Duration</td>
+                        <td>&gt;5 minutes</td>
+                    </tr>
+                    <tr>
+                        <td>Images Rated per Session</td>
+                        <td>&gt;10</td>
+                    </tr>
+                    <tr>
+                        <td>Return User Rate</td>
+                        <td>&gt;30%</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">Monetization</td>
+                        <td>Ad Revenue per User (ARPU)</td>
+                        <td>&gt;$0.10</td>
+                    </tr>
+                    <tr>
+                        <td>Click-Through Rate (CTR)</td>
+                        <td>&gt;1%</td>
+                    </tr>
+                    <tr>
+                        <td>Page Views per Session</td>
+                        <td>&gt;10</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">Quality</td>
+                        <td>Accuracy Distribution</td>
+                        <td>60-70%</td>
+                    </tr>
+                    <tr>
+                        <td>User Satisfaction Score</td>
+                        <td>&gt;4.0/5</td>
+                    </tr>
+                    <tr>
+                        <td>Social Share Rate</td>
+                        <td>&gt;5%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="tech-stack" class="section">
+            <h1>Technical Stack & Architecture</h1>
+
+            <h2>Frontend Stack</h2>
+
+            <h3>Core Framework</h3>
+            <ul>
+                <li><strong>Framework</strong>: Next.js 14 (App Router)</li>
+                <li><strong>Language</strong>: TypeScript</li>
+                <li><strong>Runtime</strong>: Node.js 18+</li>
+            </ul>
+
+            <h3>Styling & UI</h3>
+            <ul>
+                <li><strong>Styling</strong>: Tailwind CSS</li>
+                <li><strong>UI Components</strong>: shadcn/ui</li>
+                <li><strong>Animations</strong>: Framer Motion</li>
+                <li><strong>Icons</strong>: Lucide React</li>
+            </ul>
+
+            <h3>State Management</h3>
+            <ul>
+                <li><strong>Phase 1</strong>: React Context + useState/useReducer</li>
+                <li><strong>Phase 2</strong>: Redux Toolkit (when complexity increases)</li>
+            </ul>
+
+            <h2>Backend Stack</h2>
+
+            <h3>Database & Storage</h3>
+            <ul>
+                <li><strong>Primary Database</strong>: PostgreSQL (via Supabase or PlanetScale)</li>
+                <li><strong>ORM</strong>: Prisma</li>
+                <li><strong>Caching</strong>: Redis (via Upstash)</li>
+                <li><strong>Image CDN</strong>: Cloudinary or Next.js Image Optimization</li>
+            </ul>
+
+            <div class="architecture">
+┌─────────────────────────────────────────────────────────┐
+│                     Client Browser                       │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │            Next.js React Application             │   │
+│  │  ┌───────────┐  ┌──────────┐  ┌──────────┐    │   │
+│  │  │   Pages   │  │Components│  │   Hooks   │    │   │
+│  │  └───────────┘  └──────────┘  └──────────┘    │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                   Next.js API Routes                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────┐     │
+│  │   Auth   │  │   Game   │  │   Image Service   │     │
+│  └──────────┘  └──────────┘  └──────────────────┘     │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                    Data Layer                            │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────┐     │
+│  │PostgreSQL│  │  Redis   │  │  External APIs   │     │
+│  └──────────┘  └──────────┘  └──────────────────┘     │
+└─────────────────────────────────────────────────────────┘
+            </div>
+
+            <h2>Performance Targets</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Target</th>
+                        <th>Critical Threshold</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Largest Contentful Paint (LCP)</td>
+                        <td>&lt; 2.5s</td>
+                        <td>&lt; 4.0s</td>
+                    </tr>
+                    <tr>
+                        <td>First Input Delay (FID)</td>
+                        <td>&lt; 100ms</td>
+                        <td>&lt; 300ms</td>
+                    </tr>
+                    <tr>
+                        <td>Cumulative Layout Shift (CLS)</td>
+                        <td>&lt; 0.1</td>
+                        <td>&lt; 0.25</td>
+                    </tr>
+                    <tr>
+                        <td>Time to Interactive</td>
+                        <td>&lt; 3s</td>
+                        <td>&lt; 5s</td>
+                    </tr>
+                    <tr>
+                        <td>API Response Time (p95)</td>
+                        <td>&lt; 200ms</td>
+                        <td>&lt; 500ms</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="user-stories" class="section">
+            <h1>User Stories</h1>
+
+            <h2>Epic 1: Core Gameplay</h2>
+
+            <div class="highlight">
+                <h3>US-1.1: Image Display</h3>
+                <p><strong>As a</strong> player<br>
+                <strong>I want to</strong> see a large, clear image<br>
+                <strong>So that</strong> I can examine it for AI characteristics</p>
+
+                <h4>Acceptance Criteria:</h4>
+                <ul>
+                    <li>Image displays at minimum 600x600px on desktop</li>
+                    <li>Image scales responsively on mobile</li>
+                    <li>Loading indicator shows while image loads</li>
+                    <li>Images are high-resolution and clear</li>
+                    <li>Proper aspect ratio is maintained</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <h3>US-1.2: Making Choices</h3>
+                <p><strong>As a</strong> player<br>
+                <strong>I want to</strong> make my choice using obvious buttons<br>
+                <strong>So that</strong> I can easily indicate my decision</p>
+
+                <h4>Acceptance Criteria:</h4>
+                <ul>
+                    <li>Two large, contrasting buttons labeled "AI" and "Not AI"</li>
+                    <li>Buttons have hover states and click feedback</li>
+                    <li>Buttons are thumb-reachable on mobile</li>
+                    <li>Clear visual hierarchy with the question "Is this photo AI?"</li>
+                    <li>Buttons are disabled during loading/processing</li>
+                </ul>
+            </div>
+
+            <h2>Epic 2: Progress & Scoring</h2>
+
+            <div class="highlight">
+                <h3>US-2.1: Persistent Progress</h3>
+                <p><strong>As a</strong> player<br>
+                <strong>I want</strong> my score to persist across sessions<br>
+                <strong>So that</strong> I can track improvement</p>
+
+                <h4>Acceptance Criteria:</h4>
+                <ul>
+                    <li>Score saves to localStorage</li>
+                    <li>Display current streak</li>
+                    <li>Show total games played</li>
+                    <li>Calculate and display accuracy percentage</li>
+                    <li>Handle browser storage limits gracefully</li>
+                </ul>
+            </div>
+
+            <h2>Epic 3: Mobile Experience</h2>
+
+            <div class="highlight">
+                <h3>US-3.1: Swipe Gestures</h3>
+                <p><strong>As a</strong> mobile user<br>
+                <strong>I want to</strong> swipe to make choices<br>
+                <strong>So that</strong> the interaction feels natural</p>
+
+                <h4>Acceptance Criteria:</h4>
+                <ul>
+                    <li>Right swipe = "AI", Left swipe = "Not AI"</li>
+                    <li>Visual feedback during swipe</li>
+                    <li>Swipe threshold prevents accidental choices</li>
+                    <li>Option to use buttons if preferred</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="user-flows" class="section">
+            <h1>User Flows</h1>
+
+            <div class="flow-diagram">
+                <h2>Flow 1: First-Time User Journey</h2>
+                <pre>
+User Lands on Homepage
+        ↓
+See First Image + Question
+        ↓
+Make Choice: AI or Not?
+        ↓
+Show Results Page
+        ↓
+Display Correct Answer
+        ↓
+Show Community Stats
+        ↓
+Initialize Score: 0/1 or 1/1
+        ↓
+    User Action
+    ├─ Click Next → Load New Image (loop)
+    └─ Share Result → Open Share Dialog
+                </pre>
+            </div>
+
+            <div class="flow-diagram">
+                <h2>Flow 2: Mobile Swipe Interaction</h2>
+                <pre>
+Mobile User Views Image
+        ↓
+    Swipe Gesture
+    ├─ Swipe Right → Register as 'AI'
+    ├─ Swipe Left → Register as 'Not AI'
+    └─ Tap Buttons → Use Standard Button Flow
+        ↓
+    Process Vote
+        ↓
+Show Results Overlay
+        ↓
+Swipe or Tap for Next
+                </pre>
+            </div>
+
+            <div class="flow-diagram">
+                <h2>Flow 3: Results and Statistics Display</h2>
+                <pre>
+User Makes Choice
+        ↓
+Send Vote to API
+        ↓
+Store in Database
+        ↓
+Calculate Statistics
+        ↓
+Return Results
+        ↓
+Update UI Without Reload
+        ↓
+Display Result Card
+        ↓
+Show Correct Answer
+        ↓
+Display Vote Percentages
+        ↓
+Show Image Credits
+        ↓
+Update User Score
+        ↓
+Display Updated Stats
+        ↓
+Prefetch Next Image
+                </pre>
+            </div>
+        </div>
+
+        <div id="api-research" class="section">
+            <h1>API Research & Comparison</h1>
+
+            <h2>Real Photography APIs</h2>
+
+            <div class="highlight">
+                <h3>1. Unsplash API <span class="star">⭐</span> PRIMARY RECOMMENDATION</h3>
+                <p><strong>Overview</strong>: Premium quality, professionally curated stock photography platform.</p>
+
+                <h4>Pros:</h4>
+                <ul>
+                    <li>Completely free with generous rate limits (50 requests/hour)</li>
+                    <li>High-quality, curated images with consistent standards</li>
+                    <li>Detailed metadata including photographer info, camera settings</li>
+                    <li>Excellent documentation and developer support</li>
+                    <li>Large, diverse library (3M+ images)</li>
+                    <li>Easy-to-use REST API</li>
+                </ul>
+
+                <h4>Cons:</h4>
+                <ul>
+                    <li>Requires attribution (can be done programmatically)</li>
+                    <li>Limited to photography (no AI images)</li>
+                    <li>Rate limits may require caching strategy</li>
+                </ul>
+
+                <p><strong>Best For</strong>: High-quality real photos with professional standards</p>
+            </div>
+
+            <div class="highlight">
+                <h3>2. Pexels API <span class="star">⭐</span> SECONDARY RECOMMENDATION</h3>
+                <p><strong>Overview</strong>: Free stock photo platform with good variety and no attribution required.</p>
+
+                <h4>Pros:</h4>
+                <ul>
+                    <li>Free with 200 requests/hour (higher than Unsplash)</li>
+                    <li>No attribution required (though appreciated)</li>
+                    <li>Good variety of images and styles</li>
+                    <li>Video content also available</li>
+                    <li>Simple API structure</li>
+                    <li>Multiple image sizes provided</li>
+                </ul>
+
+                <h4>Cons:</h4>
+                <ul>
+                    <li>Smaller library than Unsplash (3.2M photos)</li>
+                    <li>Less detailed metadata</li>
+                    <li>Quality can be more variable</li>
+                </ul>
+
+                <p><strong>Best For</strong>: Secondary source for variety and backup when rate limited</p>
+            </div>
+
+            <h2>AI Image Generation APIs</h2>
+
+            <div class="highlight">
+                <h3>1. Replicate API <span class="star">⭐</span> PRIMARY RECOMMENDATION</h3>
+                <p><strong>Overview</strong>: Unified platform for accessing multiple AI models including Stable Diffusion, DALL-E style models, and more.</p>
+
+                <h4>Pros:</h4>
+                <ul>
+                    <li>Access to multiple AI models through single API</li>
+                    <li>Pay-per-use pricing (very affordable ~$0.0002/image)</li>
+                    <li>Can use existing AI images from their gallery</li>
+                    <li>Excellent documentation and examples</li>
+                    <li>Supports both generation and retrieval</li>
+                    <li>Wide variety of AI styles and models</li>
+                </ul>
+
+                <h4>Pricing:</h4>
+                <ul>
+                    <li>~$0.0002 per image</li>
+                    <li>~$60/month for 300,000 image serves</li>
+                </ul>
+
+                <p><strong>Best For</strong>: Primary AI image source with maximum variety</p>
+            </div>
+
+            <h2>Cost Analysis</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Usage</th>
+                        <th>Monthly Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Unsplash</td>
+                        <td>5,000 images/day</td>
+                        <td>Free</td>
+                    </tr>
+                    <tr>
+                        <td>Pexels</td>
+                        <td>2,000 images/day</td>
+                        <td>Free</td>
+                    </tr>
+                    <tr>
+                        <td>Replicate</td>
+                        <td>10,000 images/day</td>
+                        <td>$60</td>
+                    </tr>
+                    <tr>
+                        <td>Leonardo.ai</td>
+                        <td>150 images/month</td>
+                        <td>Free tier</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td>-</td>
+                        <td><strong>$60-80</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight" style="background: #d4edda; border-left-color: #28a745;">
+                <h3>ROI Calculation</h3>
+                <p>With 1000 DAU and average 10 page views per session:</p>
+                <ul>
+                    <li>Daily page views: 10,000</li>
+                    <li>Monthly page views: 300,000</li>
+                    <li>Estimated ad revenue: $300-900/month</li>
+                    <li><strong>ROI: 3.75x - 11.25x</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" style="background: #f0f8ff;">
+            <h2 style="text-align: center; color: #764ba2;">Ready to Build?</h2>
+            <p style="text-align: center; font-size: 1.2em;">
+                This document combines all essential project documentation for the AI or Not? game.<br>
+                For implementation details, refer to the <code>PHASE1_IMPLEMENTATION_BRIEF.md</code> file.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
