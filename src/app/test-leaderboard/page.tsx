@@ -4,9 +4,9 @@
 import { useEffect, useState } from "react"
 
 export default function TestLeaderboardPage() {
-  const [data, setData] = useState<unknown>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [data, setData] = useState<unknown>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
