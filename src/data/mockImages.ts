@@ -1,0 +1,118 @@
+import { GameImage } from "@/types/game"
+
+export const mockImages: GameImage[] = [
+  {
+    id: "1",
+    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
+    isAI: false,
+    source: "Unsplash",
+    credits: "Photo by Samuel Ferrara",
+    photographer: "Samuel Ferrara",
+  },
+  {
+    id: "2",
+    url: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2",
+    isAI: false,
+    source: "Unsplash",
+    credits: "Photo by Pawel Czerwinski",
+    photographer: "Pawel Czerwinski",
+  },
+  {
+    id: "3",
+    url: "https://images.unsplash.com/photo-1557683316-973673baf926",
+    isAI: false,
+    source: "Unsplash",
+    credits: "Photo by Lucas Benjamin",
+    photographer: "Lucas Benjamin",
+  },
+  {
+    id: "4",
+    url: "https://images.unsplash.com/photo-1529778873920-4da4926a72c2",
+    isAI: false,
+    source: "Unsplash",
+    credits: "Photo by Kari Shea",
+    photographer: "Kari Shea",
+  },
+  {
+    id: "5",
+    url: "https://images.unsplash.com/photo-1574169208507-84376144848b",
+    isAI: false,
+    source: "Unsplash",
+    credits: "Photo by Paweł Czerwiński",
+    photographer: "Paweł Czerwiński",
+  },
+  // AI Generated Images (using placeholder URLs for now)
+  {
+    id: "6",
+    url: "https://images.unsplash.com/photo-1614729939124-032d1e6c9945",
+    isAI: true,
+    source: "DALL-E 2",
+    credits: "AI Generated",
+    model: "DALL-E 2",
+  },
+  {
+    id: "7",
+    url: "https://images.unsplash.com/photo-1617791160505-6f00504e3519",
+    isAI: true,
+    source: "Stable Diffusion",
+    credits: "AI Generated",
+    model: "Stable Diffusion 2.1",
+  },
+  {
+    id: "8",
+    url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe",
+    isAI: true,
+    source: "Midjourney",
+    credits: "AI Generated",
+    model: "Midjourney v5",
+  },
+  {
+    id: "9",
+    url: "https://images.unsplash.com/photo-1559827260-dc66d52bef19",
+    isAI: true,
+    source: "DALL-E 2",
+    credits: "AI Generated",
+    model: "DALL-E 2",
+  },
+  {
+    id: "10",
+    url: "https://images.unsplash.com/photo-1620121692029-d088224ddc74",
+    isAI: true,
+    source: "Stable Diffusion",
+    credits: "AI Generated",
+    model: "Stable Diffusion XL",
+  },
+  // More real images
+  {
+    id: "11",
+    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    isAI: false,
+    source: "Unsplash",
+    credits: "Photo by Joseph Gonzalez",
+    photographer: "Joseph Gonzalez",
+  },
+  {
+    id: "12",
+    url: "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+    isAI: false,
+    source: "Unsplash",
+    credits: "Photo by Tyler Nix",
+    photographer: "Tyler Nix",
+  },
+]
+
+// Mock vote statistics
+export const mockVoteStats: Record<string, { aiVotes: number; realVotes: number }> = {
+  "1": { aiVotes: 234, realVotes: 567 },
+  "2": { aiVotes: 456, realVotes: 345 },
+  "3": { aiVotes: 123, realVotes: 789 },
+  "4": { aiVotes: 678, realVotes: 234 },
+  "5": { aiVotes: 345, realVotes: 456 },
+  "6": { aiVotes: 789, realVotes: 123 },
+  "7": { aiVotes: 567, realVotes: 234 },
+  "8": { aiVotes: 890, realVotes: 110 },
+  "9": { aiVotes: 456, realVotes: 345 },
+  "10": { aiVotes: 678, realVotes: 123 },
+  "11": { aiVotes: 234, realVotes: 789 },
+  "12": { aiVotes: 456, realVotes: 567 },
+}

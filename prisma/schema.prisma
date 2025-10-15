@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Image {
+  id         String   @id @default(cuid())
+  url        String   @unique
+  source     String   // e.g., 'Unsplash', 'Pexels', 'DALL-E', 'Stable Diffusion'
+  type       String   // 'real' or 'ai'
+  metadata   Json?    // Additional image metadata
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  votes      Vote[]
+  stats      Stat?
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  imageId   String
+  userId    String?  // Optional, for authenticated users
+  choice    String   // 'ai' or 'real'
+  createdAt DateTime @default(now())
+  
+  image  Image @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull) // Optional user relation
+  
+  @@unique([imageId, userId]) // A user can only vote once per image
+}
+
+model User {
+  id         String   @id @default(cuid())
+  username   String?  // Optional username for display
+  totalScore Int      @default(0)
+  accuracy   Float    @default(0)
+  currentStreak Int   @default(0)
+  bestStreak Int      @default(0)
+  totalPlayed Int     @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  votes      Vote[]
+  leaderboardEntry Leaderboard?
+}
+
+model Stat {
+  id           String   @id @default(cuid())
+  imageId      String   @unique // Each image can only have one stat record
+  totalVotes   Int      @default(0)
+  aiVotes      Int      @default(0)
+  realVotes    Int      @default(0)
+  aiPercentage Float    @default(0)
+  realPercentage Float  @default(0)
+  lastUpdated  DateTime @updatedAt
+  
+  image Image @relation(fields: [imageId], references: [id], onDelete: Cascade)
+}
+
+model Leaderboard {
+  id        String   @id @default(cuid())
+  userId    String   @unique // Each user can only have one leaderboard entry
+  score     Int
+  rank      Int      @default(0)
+  updatedAt DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
