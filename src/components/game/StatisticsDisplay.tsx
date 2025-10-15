@@ -1,7 +1,6 @@
 // components/game/StatisticsDisplay.tsx
 "use client"
 
-// Card components are not used in this component
 import { VoteStats } from "@/types/game"
 import { StatisticsChart } from "./StatisticsChart"
 
