@@ -56,7 +56,7 @@ Comprehensive documentation is available in the `/docs` directory:
 
 ### External Services
 - **Real Images**: Unsplash API, Pexels API
-- **AI Images**: Replicate API, Leonardo.ai
+- **AI Images**: Midjourney public gallery, Stability AI gallery API, Replicate API, Leonardo.ai
 - **Analytics**: Vercel Analytics
 - **Hosting**: Vercel
 
@@ -95,7 +95,10 @@ UNSPLASH_ACCESS_KEY=your_unsplash_key
 PEXELS_API_KEY=your_pexels_key
 REPLICATE_API_TOKEN=your_replicate_token
 LEONARDO_API_KEY=your_leonardo_key
+STABILITY_API_KEY=your_stability_gallery_key
 ```
+
+Midjourney community images are sourced directly from the public Explore feed, so no API key is required.
 
 4. Run database migrations:
 ```bash

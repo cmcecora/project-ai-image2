@@ -19,6 +19,7 @@ model Image {
   url        String   @unique
   source     String   // e.g., 'Unsplash', 'Pexels', 'DALL-E', 'Stable Diffusion'
   type       String   // 'real' or 'ai'
+  mediaType  String?  // 'image' or 'video'
   metadata   Json?    // Additional image metadata
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

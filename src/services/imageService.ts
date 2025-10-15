@@ -13,6 +13,7 @@ export class ImageService {
   private pexelsKey = process.env.PEXELS_API_KEY;
   private replicateToken = process.env.REPLICATE_API_TOKEN;
   private leonardoKey = process.env.LEONARDO_API_KEY;
+  private stabilityKey = process.env.STABILITY_API_KEY || process.env.STABILITY_API_TOKEN;
   private aiPrompts = [
     'hyper-realistic portrait photography, dramatic lighting, 85mm lens',
     'futuristic cityscape at dusk, cinematic lighting, ultra detailed',
@@ -231,29 +232,153 @@ export class ImageService {
   }
 
   /**
-   * Generate AI-style images using the Pollinations API (no key required)
+   * Fetch AI imagery from the Midjourney public Explore feed
    */
-  async fetchAIImagesFromPollinations(params: ImageSearchParams = {}): Promise<GameImage[]> {
+  async fetchAIImagesFromMidjourney(params: ImageSearchParams = {}): Promise<GameImage[]> {
     const { count = 10 } = params;
-    const images: GameImage[] = [];
+    const exploreUrl = 'https://www.midjourney.com/explore';
 
-    for (let i = 0; i < count; i++) {
-      const prompt = this.aiPrompts[Math.floor(Math.random() * this.aiPrompts.length)];
-      const seed = `${Date.now()}_${i}_${Math.floor(Math.random() * 1000)}`;
-      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}`;
-
-      images.push({
-        id: `pollinations_${seed}`,
-        url,
-        isAI: true,
-        source: 'Pollinations AI',
-        credits: `Prompt: ${prompt}`,
-        model: 'Pollinations',
+    try {
+      const response = await fetch(exploreUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+        cache: 'no-store',
       });
+
+      if (!response.ok) {
+        throw new Error(`Midjourney Explore request failed with status ${response.status}`);
+      }
+
+      const html = await response.text();
+      const sanitized = html
+        .replace(/\u002F/g, '/')
+        .replace(/\\\//g, '/');
+      const imageUrlRegex = /https:\/\/cdn\.midjourney\.com\/[A-Za-z0-9\-\/_]+\.(?:png|jpg|jpeg|gif|webp|avif)/gi;
+      const rawMatches = sanitized.match(imageUrlRegex) ?? [];
+      const uniqueUrls = Array.from(
+        new Set(
+          rawMatches.map((url) => url.replace(/\?.*$/, ''))
+        )
+      );
+
+      return uniqueUrls.slice(0, count).map((url, index) => {
+        const isVideo = /\.(mp4|webm|ogg|mov|avi|mkv|m4v)$/i.test(url)
+        return {
+          id: `midjourney_${Date.now()}_${index}`,
+          url,
+          isAI: true,
+          source: 'Midjourney Community',
+          credits: 'Image courtesy of the Midjourney public gallery',
+          model: 'Midjourney',
+          mediaType: isVideo ? 'video' : 'image',
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching Midjourney images:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Fetch AI imagery from the Stability AI public gallery endpoint
+   */
+  async fetchAIImagesFromStableDiffusion(params: ImageSearchParams = {}): Promise<GameImage[]> {
+    if (!this.stabilityKey) {
+      console.warn('Stability API key not configured');
+      return [];
     }
 
-    return images;
+    const { count = 10, page = 1 } = params;
+    const perPage = Math.min(Math.max(count, 1), 50);
+    const galleryUrl = new URL('https://api.stability.ai/v2beta/stable-diffusion-3/gallery');
+    galleryUrl.searchParams.set('page', page.toString());
+    galleryUrl.searchParams.set('per_page', perPage.toString());
+
+    try {
+      const response = await fetch(galleryUrl.toString(), {
+        headers: {
+          Authorization: `Bearer ${this.stabilityKey}`,
+          Accept: 'application/json',
+        },
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Stability AI gallery request failed with status ${response.status}`);
+      }
+
+      interface StabilityGalleryCreator {
+        username?: string;
+        profile_url?: string;
+      }
+
+      interface StabilityGalleryImage {
+        id?: string;
+        url?: string;
+        prompt?: string;
+        model?: string;
+        gallery_url?: string;
+        creator?: StabilityGalleryCreator;
+      }
+
+      interface StabilityGalleryResponse {
+        images?: StabilityGalleryImage[];
+      }
+
+      const data: StabilityGalleryResponse = await response.json();
+      const images = data.images ?? [];
+
+      return images
+        .filter((image): image is StabilityGalleryImage & { url: string } => Boolean(image.url))
+        .slice(0, count)
+        .map((image, index) => {
+          const isVideo = /\.(mp4|webm|ogg|mov|avi|mkv|m4v)$/i.test(image.url)
+          return {
+            id: `stability_${image.id ?? `${Date.now()}_${index}`}`,
+            url: image.url,
+            isAI: true,
+            source: 'Stability AI Gallery',
+            credits: image.creator?.username
+              ? `Creator: ${image.creator.username}`
+              : 'Image courtesy of the Stability AI community gallery',
+            model: image.model ?? 'Stable Diffusion',
+            mediaType: isVideo ? 'video' : 'image',
+          }
+        });
+    } catch (error) {
+      console.error('Error fetching Stable Diffusion images:', error);
+      return [];
+    }
   }
+
+  /**
+   * Generate AI-style images using the Pollinations API (no key required)
+   * COMMENTED OUT: Disabled to only show Midjourney and Mage.space images
+   */
+  // async fetchAIImagesFromPollinations(params: ImageSearchParams = {}): Promise<GameImage[]> {
+  //   const { count = 10 } = params;
+  //   const images: GameImage[] = [];
+
+  //   for (let i = 0; i < count; i++) {
+  //     const prompt = this.aiPrompts[Math.floor(Math.random() * this.aiPrompts.length)];
+  //     const seed = `${Date.now()}_${i}_${Math.floor(Math.random() * 1000)}`;
+  //     const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}`;
+
+  //     images.push({
+  //       id: `pollinations_${seed}`,
+  //       url,
+  //       isAI: true,
+  //       source: 'Pollinations AI',
+  //       credits: `Prompt: ${prompt}`,
+  //       model: 'Pollinations',
+  //     });
+  //   }
+
+  //   return images;
+  // }
 
   /**
    * Fetch mixed images (real and AI) from all available sources
@@ -284,9 +409,23 @@ export class ImageService {
 
     const aiImages: GameImage[] = [];
 
-    // Prefer Pollinations for AI imagery (no API keys required)
-    const pollinationImages = await this.fetchAIImagesFromPollinations({ count: desiredAiCount });
-    aiImages.push(...pollinationImages);
+    // Start with Midjourney community gallery imagery
+    const midjourneyImages = await this.fetchAIImagesFromMidjourney({ count: desiredAiCount });
+    aiImages.push(...midjourneyImages);
+
+    // Pull additional AI images from the Stability AI public gallery when available
+    if (aiImages.length < desiredAiCount) {
+      const remaining = desiredAiCount - aiImages.length;
+      const stabilityImages = await this.fetchAIImagesFromStableDiffusion({ count: remaining });
+      aiImages.push(...stabilityImages);
+    }
+
+    // COMMENTED OUT: Pollinations fallback disabled - only using Midjourney and Mage.space
+    // if (aiImages.length < desiredAiCount) {
+    //   const remaining = desiredAiCount - aiImages.length;
+    //   const pollinationImages = await this.fetchAIImagesFromPollinations({ count: remaining });
+    //   aiImages.push(...pollinationImages);
+    // }
 
     // If Replicate is configured, include those images too
     if (aiImages.length < desiredAiCount) {

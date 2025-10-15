@@ -1,36 +1,56 @@
 // components/game/StatisticsChart.tsx
-"use client";
+"use client"
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { VoteStats } from '@/types/game';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
+import { VoteStats } from "@/types/game"
 
 interface StatisticsChartProps {
-  stats: VoteStats;
+  stats: VoteStats
 }
 
-const COLORS = ['#8884d8', '#82ca9d'];
+const COLORS = ["#8884d8", "#82ca9d"]
 
 export function StatisticsChart({ stats }: StatisticsChartProps) {
   const data = [
-    { name: 'AI Generated', value: stats.aiVotes },
-    { name: 'Real Photo', value: stats.realVotes },
-  ];
+    { name: "AI Generated", value: stats.aiVotes },
+    { name: "Real Photo", value: stats.realVotes },
+  ]
 
-  const RADIAN = Math.PI / 180;
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  const RADIAN = Math.PI / 180
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+  }: {
+    cx: number
+    cy: number
+    midAngle: number
+    innerRadius: number
+    outerRadius: number
+    percent: number
+  }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+    const x = cx + radius * Math.cos(-midAngle * RADIAN)
+    const y = cy + radius * Math.sin(-midAngle * RADIAN)
 
     return (
-      <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="central"
+      >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
-    );
-  };
+    )
+  }
 
   return (
-    <div className="w-full h-64">
+    <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -52,5 +72,5 @@ export function StatisticsChart({ stats }: StatisticsChartProps) {
         </PieChart>
       </ResponsiveContainer>
     </div>
-  );
+  )
 }

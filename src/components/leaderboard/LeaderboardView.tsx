@@ -1,44 +1,44 @@
 // components/leaderboard/LeaderboardView.tsx
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Trophy, Medal, Crown } from "lucide-react";
-import { leaderboardService, LeaderboardEntry, LeaderboardResponse } from "@/services/leaderboardService";
+import { useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Trophy, Medal, Crown } from "lucide-react"
+import { leaderboardService, LeaderboardResponse } from "@/services/leaderboardService"
 
 export function LeaderboardView() {
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        const data = await leaderboardService.fetchLeaderboard();
-        
+        setLoading(true)
+        setError(null)
+        const data = await leaderboardService.fetchLeaderboard()
+
         if (data) {
-          setLeaderboardData(data);
+          setLeaderboardData(data)
         } else {
-          setError("Failed to load leaderboard data");
+          setError("Failed to load leaderboard data")
         }
       } catch (err) {
-        setError("An error occurred while loading the leaderboard");
-        console.error(err);
+        setError("An error occurred while loading the leaderboard")
+        console.error(err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchLeaderboard();
-  }, []);
+    fetchLeaderboard()
+  }, [])
 
   if (error) {
     return (
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="mx-auto w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Trophy className="h-5 w-5" />
@@ -46,16 +46,14 @@ export function LeaderboardView() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-red-500">
-            {error}
-          </div>
+          <div className="py-8 text-center text-red-500">{error}</div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="mx-auto w-full max-w-2xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Trophy className="h-5 w-5" />
@@ -77,16 +75,19 @@ export function LeaderboardView() {
           <div className="space-y-2">
             {leaderboardData?.leaderboard && leaderboardData.leaderboard.length > 0 ? (
               leaderboardData.leaderboard.map((player, index) => (
-                <div 
-                  key={player.id} 
-                  className={`flex items-center gap-4 p-3 rounded-lg ${
-                    index === 0 ? "bg-yellow-50 border border-yellow-200" : 
-                    index === 1 ? "bg-gray-50 border border-gray-200" : 
-                    index === 2 ? "bg-amber-50 border border-amber-200" : 
-                    "bg-white border border-gray-100"
+                <div
+                  key={player.id}
+                  className={`flex items-center gap-4 rounded-lg p-3 ${
+                    index === 0
+                      ? "border border-yellow-200 bg-yellow-50"
+                      : index === 1
+                        ? "border border-gray-200 bg-gray-50"
+                        : index === 2
+                          ? "border border-amber-200 bg-amber-50"
+                          : "border border-gray-100 bg-white"
                   }`}
                 >
-                  <div className="flex items-center justify-center w-8">
+                  <div className="flex w-8 items-center justify-center">
                     {index === 0 && <Crown className="h-5 w-5 text-yellow-500" />}
                     {index === 1 && <Medal className="h-5 w-5 text-gray-400" />}
                     {index === 2 && <Medal className="h-5 w-5 text-amber-600" />}
@@ -96,20 +97,16 @@ export function LeaderboardView() {
                       </Badge>
                     )}
                   </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">
-                      {player.username}
-                    </p>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{player.username}</p>
                     <p className="text-xs text-muted-foreground">
                       {player.totalPlayed} games • {player.accuracy.toFixed(1)}% accuracy
                     </p>
                   </div>
-                  
+
                   <div className="text-right">
-                    <p className="font-bold">
-                      {player.totalScore}
-                    </p>
+                    <p className="font-bold">{player.totalScore}</p>
                     <p className="text-xs text-muted-foreground">
                       Best streak: {player.bestStreak}
                     </p>
@@ -117,17 +114,17 @@ export function LeaderboardView() {
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="py-8 text-center text-muted-foreground">
                 No leaderboard data available yet. Play some games to appear on the leaderboard!
               </div>
             )}
-            
+
             {leaderboardData && leaderboardData.pagination.totalPages > 1 && (
-              <div className="flex justify-center gap-2 mt-4">
+              <div className="mt-4 flex justify-center gap-2">
                 {[...Array(leaderboardData.pagination.totalPages)].map((_, index) => (
                   <button
                     key={index}
-                    className={`px-3 py-1 rounded ${
+                    className={`rounded px-3 py-1 ${
                       index + 1 === leaderboardData.pagination.page
                         ? "bg-primary text-primary-foreground"
                         : "bg-gray-100 hover:bg-gray-200"
@@ -145,5 +142,5 @@ export function LeaderboardView() {
         )}
       </CardContent>
     </Card>
-  );
+  )
 }
