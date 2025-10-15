@@ -265,7 +265,7 @@ export class ImageService {
       );
 
       return uniqueUrls.slice(0, count).map((url, index) => {
-        const isVideo = /\.(mp4|webm|ogg|mov|avi|mkv|m4v)$/i.test(url)
+        const isVideo = /\.(mp4|webm|ogg|mov|avi|mkv|m4v)$/i.test(url);
         return {
           id: `midjourney_${Date.now()}_${index}`,
           url,
