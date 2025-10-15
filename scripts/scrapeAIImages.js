@@ -106,7 +106,7 @@ async function scrapeMidjourneyImages(page, count = 50) {
     console.log(`✅ Scraped ${imageArray.length} images from Midjourney\n`);
 
     return imageArray.map(url => {
-      const isVideo = /\.(mp4|webm|ogg|mov|avi|mkv|m4v)$/i.test(url)
+      const isVideo = /\.(mp4|webm|ogg|mov|avi|mkv|m4v)$/i.test(url);
       return {
         url,
         source: 'Midjourney',
