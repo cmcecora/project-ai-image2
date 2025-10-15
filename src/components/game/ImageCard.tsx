@@ -11,6 +11,18 @@ interface ImageCardProps {
   isLoading: boolean
 }
 
+// Helper function to determine if URL is a video
+function isVideoUrl(url: string): boolean {
+  const videoExtensions = /\.(mp4|webm|ogg|mov|avi|mkv|m4v)$/i
+  return videoExtensions.test(url)
+}
+
+// Helper function to determine if URL is an image
+function isImageUrl(url: string): boolean {
+  const imageExtensions = /\.(jpg|jpeg|png|gif|webp|avif|bmp|svg)$/i
+  return imageExtensions.test(url)
+}
+
 export function ImageCard({ image, isLoading }: ImageCardProps) {
   const [imageLoading, setImageLoading] = useState(true)
   const [dimensions, setDimensions] = useState({ width: 400, height: 400 })
@@ -40,14 +52,14 @@ export function ImageCard({ image, isLoading }: ImageCardProps) {
 
   if (isLoading || !image) {
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex items-center justify-center">
         <Card
           className="relative overflow-hidden bg-gray-100"
           style={{
             width: `${dimensions.width}px`,
             height: `${dimensions.height}px`,
             maxWidth: "min(90vw, 800px)",
-            maxHeight: "50vh"
+            maxHeight: "50vh",
           }}
         >
           <Skeleton className="h-full w-full" />
@@ -57,14 +69,14 @@ export function ImageCard({ image, isLoading }: ImageCardProps) {
   }
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex items-center justify-center">
       <Card
         className="relative overflow-hidden bg-gray-100 shadow-xl"
         style={{
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
           maxWidth: "min(90vw, 800px)",
-          maxHeight: "50vh"
+          maxHeight: "50vh",
         }}
       >
         {imageLoading && (
@@ -72,16 +84,33 @@ export function ImageCard({ image, isLoading }: ImageCardProps) {
             <Skeleton className="h-full w-full" />
           </div>
         )}
-        <Image
-          src={image.url}
-          alt="Can you tell if this image is AI generated?"
-          fill
-          sizes="(max-width: 768px) 90vw, (max-width: 1200px) 70vw, 800px"
-          className="object-contain"
-          priority
-          onLoad={() => setImageLoading(false)}
-          onError={() => setImageLoading(false)}
-        />
+
+        {/* Render video if URL is a video */}
+        {isVideoUrl(image.url) ? (
+          <video
+            src={image.url}
+            className="h-full w-full object-contain"
+            autoPlay
+            loop
+            muted
+            playsInline
+            onLoadedData={() => setImageLoading(false)}
+            onError={() => setImageLoading(false)}
+          />
+        ) : (
+          /* Render image if URL is an image */
+          <Image
+            src={image.url}
+            alt="Can you tell if this image is AI generated?"
+            fill
+            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 70vw, 800px"
+            className="object-contain"
+            priority
+            unoptimized
+            onLoad={() => setImageLoading(false)}
+            onError={() => setImageLoading(false)}
+          />
+        )}
       </Card>
     </div>
   )

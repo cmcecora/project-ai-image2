@@ -1,7 +1,7 @@
 // app/test-leaderboard/page.tsx
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 
 export default function TestLeaderboardPage() {
   const [data, setData] = useState<unknown>(null);
@@ -11,33 +11,33 @@ export default function TestLeaderboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        const response = await fetch("/api/leaderboard");
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+        setLoading(true)
+        setError(null)
+        const response = await fetch("/api/leaderboard")
 
-    fetchData();
-  }, []);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`)
+        }
+
+        const result = await response.json()
+        setData(result)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred")
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div>Error: {error}</div>
   }
 
   return (
@@ -45,5 +45,5 @@ export default function TestLeaderboardPage() {
       <h1>Test Leaderboard Page</h1>
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
-  );
+  )
 }

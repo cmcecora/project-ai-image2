@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,9 +16,30 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'picsum.photos',
       },
+      // REMOVED: Pollinations AI - only using Midjourney and Mage.space
+      // {
+      //   protocol: 'https',
+      //   hostname: 'image.pollinations.ai',
+      // },
       {
         protocol: 'https',
-        hostname: 'image.pollinations.ai',
+        hostname: 'cdn.midjourney.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'resize.mage.space',
+      },
+      {
+        protocol: 'https',
+        hostname: 'mage.space',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cloudflare.com',
       },
     ],
   },

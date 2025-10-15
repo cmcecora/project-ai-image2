@@ -6,6 +6,8 @@ export interface GameImage {
   credits?: string
   photographer?: string
   model?: string
+  mediaType?: 'image' | 'video' // New field to specify media type
+  duration?: number // For videos, duration in seconds
 }
 
 export interface GameState {

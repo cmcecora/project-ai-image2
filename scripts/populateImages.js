@@ -1,5 +1,5 @@
 // scripts/populateImages.js
-const { PrismaClient } = require('../src/generated/prisma');
+import { PrismaClient } from '../src/generated/prisma/index.js';
 
 const prisma = new PrismaClient();
 

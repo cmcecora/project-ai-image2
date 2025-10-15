@@ -73,12 +73,27 @@ export function GameContainer() {
     }
   }, [])
 
-  // Load initial image
+  // Load initial image - only run once on mount
   useEffect(() => {
-    loadNewImage().catch((error) => {
-      console.error("Failed to load initial image:", error)
-    })
-  }, [loadNewImage])
+    let isMounted = true
+
+    const loadInitialImage = async () => {
+      try {
+        await loadNewImage()
+      } catch (error) {
+        if (isMounted) {
+          console.error("Failed to load initial image:", error)
+        }
+      }
+    }
+
+    loadInitialImage()
+
+    return () => {
+      isMounted = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Empty dependency array - only run once on mount, loadNewImage is stable
 
   const handleChoice = async (isAI: boolean) => {
     if (!gameState.currentImage || gameState.showResults) return
@@ -198,7 +213,6 @@ export function GameContainer() {
                 <ResultsOverlay
                   image={gameState.currentImage}
                   isCorrect={gameState.isCorrect!}
-                  userChoice={gameState.lastChoice!}
                   onNext={handleNext}
                 />
               </motion.div>

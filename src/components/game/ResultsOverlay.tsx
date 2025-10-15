@@ -13,26 +13,20 @@ import { StatisticsChart } from "./StatisticsChart"
 interface ResultsOverlayProps {
   image: GameImage
   isCorrect: boolean
-  userChoice: boolean
   onNext: () => void
 }
 
-export function ResultsOverlay({
-  image,
-  isCorrect,
-  userChoice,
-  onNext,
-}: ResultsOverlayProps) {
-  const [stats, setStats] = useState<VoteStats | null>(null);
-  const [loading, setLoading] = useState(true);
+export function ResultsOverlay({ image, isCorrect, onNext }: ResultsOverlayProps) {
+  const [stats, setStats] = useState<VoteStats | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        const fetchedStats = await statsService.fetchImageStats(image.id);
+        const fetchedStats = await statsService.fetchImageStats(image.id)
         if (fetchedStats) {
-          setStats(fetchedStats);
+          setStats(fetchedStats)
         } else {
           // Fallback to default stats if no stats are returned
           setStats({
@@ -42,10 +36,10 @@ export function ResultsOverlay({
             realVotes: 0,
             aiPercentage: 50,
             realPercentage: 50,
-          });
+          })
         }
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error("Error fetching stats:", error)
         // Fallback to default stats on error
         setStats({
           imageId: image.id,
@@ -54,14 +48,14 @@ export function ResultsOverlay({
           realVotes: 0,
           aiPercentage: 50,
           realPercentage: 50,
-        });
+        })
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchStats();
-  }, [image.id]);
+    fetchStats()
+  }, [image.id])
 
   if (loading) {
     return (
@@ -73,15 +67,15 @@ export function ResultsOverlay({
         <Card>
           <CardContent className="p-8 text-center">
             <div className="animate-pulse space-y-4">
-              <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-              <div className="h-32 bg-gray-200 rounded mt-6"></div>
-              <div className="h-10 bg-gray-200 rounded w-full mt-8"></div>
+              <div className="mx-auto h-6 w-3/4 rounded bg-gray-200"></div>
+              <div className="mx-auto h-4 w-1/2 rounded bg-gray-200"></div>
+              <div className="mt-6 h-32 rounded bg-gray-200"></div>
+              <div className="mt-8 h-10 w-full rounded bg-gray-200"></div>
             </div>
           </CardContent>
         </Card>
       </motion.div>
-    );
+    )
   }
 
   const displayStats = stats || {
@@ -91,11 +85,11 @@ export function ResultsOverlay({
     realVotes: 0,
     aiPercentage: 50,
     realPercentage: 50,
-  };
+  }
 
-  const totalVotes = displayStats.totalVotes;
-  const aiPercentage = displayStats.aiPercentage;
-  const realPercentage = displayStats.realPercentage;
+  const totalVotes = displayStats.totalVotes
+  const aiPercentage = displayStats.aiPercentage
+  const realPercentage = displayStats.realPercentage
 
   return (
     <motion.div
@@ -122,9 +116,10 @@ export function ResultsOverlay({
         <CardContent className="space-y-4">
           <div>
             <p className="font-medium">
-              This image is: <span className="font-bold">{image.isAI ? "AI Generated" : "Real"}</span>
+              This image is:{" "}
+              <span className="font-bold">{image.isAI ? "AI Generated" : "Real"}</span>
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="mt-1 text-sm text-muted-foreground">
               {image.isAI ? `Generated with ${image.model}` : `Photo by ${image.photographer}`}
             </p>
           </div>
@@ -136,7 +131,7 @@ export function ResultsOverlay({
                 <span>AI Generated</span>
                 <span>{aiPercentage}%</span>
               </div>
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
                 <div
                   className="h-full bg-purple-500 transition-all duration-500"
                   style={{ width: `${aiPercentage}%` }}
@@ -148,14 +143,14 @@ export function ResultsOverlay({
                 <span>Real Photo</span>
                 <span>{realPercentage}%</span>
               </div>
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
                 <div
                   className="h-full bg-blue-500 transition-all duration-500"
                   style={{ width: `${realPercentage}%` }}
                 />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-2">
+            <p className="mt-2 text-center text-xs text-muted-foreground">
               {totalVotes.toLocaleString()} votes
             </p>
           </div>
