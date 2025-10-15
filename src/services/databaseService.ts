@@ -2,8 +2,30 @@
 import { prisma } from '@/lib/prisma';
 import { imageService } from './imageService';
 import { GameImage } from '@/types/game';
+import crypto from 'crypto';
 
 export class DatabaseService {
+  /**
+   * Generate a cryptographically secure random number between 0 and 1
+   */
+  private getSecureRandom(): number {
+    const buffer = crypto.randomBytes(4);
+    const maxValue = 0xffffffff;
+    const randomValue = buffer.readUInt32BE(0);
+    return randomValue / maxValue;
+  }
+
+  /**
+   * Securely shuffle an array using Fisher-Yates algorithm with crypto random
+   */
+  private secureShuffleArray<T>(array: T[]): T[] {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(this.getSecureRandom() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  }
   /**
    * Populate the database with images from external sources
    */
@@ -46,30 +68,126 @@ export class DatabaseService {
   }
 
   /**
-   * Get a random image from the database
+   * Mark an image as viewed for a session
    */
-  async getRandomImage(): Promise<GameImage | null> {
+  async markImageAsViewed(sessionId: string, imageId: string): Promise<void> {
     try {
-      // Get total count of images
-      const count = await prisma.image.count();
-      if (count === 0) return null;
-
-      // Get a random offset
-      const randomOffset = Math.floor(Math.random() * count);
-
-      // Fetch the image at the random offset
-      const image = await prisma.image.findFirst({
-        skip: randomOffset,
-        select: {
-          id: true,
-          url: true,
-          source: true,
-          type: true,
-          metadata: true,
+      await prisma.viewedImage.upsert({
+        where: {
+          sessionId_imageId: {
+            sessionId,
+            imageId,
+          },
+        },
+        update: {
+          viewedAt: new Date(),
+        },
+        create: {
+          sessionId,
+          imageId,
         },
       });
+    } catch (error) {
+      console.error('Error marking image as viewed:', error);
+    }
+  }
+
+  /**
+   * Get unviewed images for a session
+   */
+  async getUnviewedImagesCount(sessionId: string): Promise<number> {
+    try {
+      const totalImages = await prisma.image.count();
+      const viewedCount = await prisma.viewedImage.count({
+        where: { sessionId },
+      });
+      return totalImages - viewedCount;
+    } catch (error) {
+      console.error('Error getting unviewed images count:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Get a random unviewed image from the database with truly random selection
+   * If all images have been viewed, automatically populate more images
+   */
+  async getRandomImage(sessionId?: string): Promise<GameImage | null> {
+    try {
+      // Get total count of images
+      const totalCount = await prisma.image.count();
+      if (totalCount === 0) return null;
+
+      let imagePool: { id: string; url: string; source: string; type: string; metadata: unknown }[] = [];
+
+      if (sessionId) {
+        // Check if all images have been viewed
+        const unviewedCount = await this.getUnviewedImagesCount(sessionId);
+
+        if (unviewedCount === 0) {
+          console.log('All images have been viewed. Populating more images...');
+          await this.populateImages(50);
+
+          // Fetch all images after population
+          imagePool = await prisma.image.findMany({
+            select: {
+              id: true,
+              url: true,
+              source: true,
+              type: true,
+              metadata: true,
+            },
+          });
+        } else {
+          // Fetch only unviewed images
+          const viewedImageIds = await prisma.viewedImage.findMany({
+            where: { sessionId },
+            select: { imageId: true },
+          });
+
+          const viewedIds = viewedImageIds.map((v: { imageId: string }) => v.imageId);
+
+          imagePool = await prisma.image.findMany({
+            where: {
+              id: {
+                notIn: viewedIds,
+              },
+            },
+            select: {
+              id: true,
+              url: true,
+              source: true,
+              type: true,
+              metadata: true,
+            },
+          });
+        }
+      } else {
+        // No session tracking, fetch all images
+        imagePool = await prisma.image.findMany({
+          select: {
+            id: true,
+            url: true,
+            source: true,
+            type: true,
+            metadata: true,
+          },
+        });
+      }
+
+      if (imagePool.length === 0) return null;
+
+      // Use cryptographically secure random selection
+      // This ensures truly random distribution without bias
+      const randomIndex = Math.floor(this.getSecureRandom() * imagePool.length);
+      const image = imagePool[randomIndex];
 
       if (!image) return null;
+
+      // Mark as viewed if session is provided
+      if (sessionId) {
+        await this.markImageAsViewed(sessionId, image.id);
+      }
 
       // Convert to GameImage format
       return {
@@ -77,14 +195,14 @@ export class DatabaseService {
         url: image.url,
         isAI: image.type === 'ai',
         source: image.source,
-        photographer: image.metadata && typeof image.metadata === 'object' && 'photographer' in image.metadata 
-          ? image.metadata.photographer as string 
+        photographer: image.metadata && typeof image.metadata === 'object' && 'photographer' in image.metadata
+          ? image.metadata.photographer as string
           : undefined,
-        model: image.metadata && typeof image.metadata === 'object' && 'model' in image.metadata 
-          ? image.metadata.model as string 
+        model: image.metadata && typeof image.metadata === 'object' && 'model' in image.metadata
+          ? image.metadata.model as string
           : undefined,
-        credits: image.metadata && typeof image.metadata === 'object' && 'credits' in image.metadata 
-          ? image.metadata.credits as string 
+        credits: image.metadata && typeof image.metadata === 'object' && 'credits' in image.metadata
+          ? image.metadata.credits as string
           : undefined,
       };
     } catch (error) {
