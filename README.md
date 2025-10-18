@@ -7,23 +7,27 @@
 ## Key Features
 
 ### Core Gameplay
+
 - **Binary Choice System**: Simple "AI" or "Not AI" decision for each image
 - **Instant Feedback**: Immediate results showing correct answer and community statistics
 - **Continuous Play**: Seamless progression without page reloads
 - **Dynamic Content**: Infinite rotation of images fetched from multiple sources
 
 ### Gamification
+
 - **Persistent Scoring**: Track your accuracy and improvement over time
 - **Global Leaderboard**: Compete with players worldwide
 - **Streak Tracking**: Build consecutive correct answer streaks
 - **Social Sharing**: Share results and challenge friends on social media
 
 ### Mobile Experience
+
 - **Responsive Design**: Optimized for all screen sizes
 - **Swipe Gestures**: Dating app-style swiping (right for AI, left for Real)
 - **Touch-Optimized**: Large, thumb-friendly interaction areas
 
 ### Monetization
+
 - **Strategic Ad Placement**: 4 non-intrusive banner positions
 - **High-Quality Ad Networks**: Premium display advertising
 - **User-Friendly**: Ads that don't disrupt gameplay
@@ -42,6 +46,7 @@ Comprehensive documentation is available in the `/docs` directory:
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS + shadcn/ui
@@ -49,12 +54,14 @@ Comprehensive documentation is available in the `/docs` directory:
 - **Animations**: Framer Motion
 
 ### Backend
+
 - **API**: Next.js API Routes
 - **Database**: PostgreSQL (Supabase/PlanetScale)
 - **ORM**: Prisma
 - **Caching**: Redis (Upstash)
 
 ### External Services
+
 - **Real Images**: Unsplash API, Pexels API
 - **AI Images**: Midjourney public gallery, Stability AI gallery API, Replicate API, Leonardo.ai
 - **Analytics**: Vercel Analytics
@@ -63,6 +70,7 @@ Comprehensive documentation is available in the `/docs` directory:
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or yarn
 - PostgreSQL database (or Supabase account)
@@ -71,12 +79,14 @@ Comprehensive documentation is available in the `/docs` directory:
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/ai-or-not.git
 cd ai-or-not
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 # or
@@ -84,11 +94,13 @@ yarn install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env.local
 ```
 
 Edit `.env.local` with your API keys:
+
 ```env
 DATABASE_URL=your_database_url
 UNSPLASH_ACCESS_KEY=your_unsplash_key
@@ -101,11 +113,13 @@ STABILITY_API_KEY=your_stability_gallery_key
 Midjourney community images are sourced directly from the public Explore feed, so no API key is required.
 
 4. Run database migrations:
+
 ```bash
 npx prisma migrate dev
 ```
 
 5. Start the development server:
+
 ```bash
 npm run dev
 # or
@@ -117,6 +131,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 ## Development
 
 ### Project Structure
+
 ```
 ├── src/
 │   ├── app/           # Next.js app router pages
@@ -141,17 +156,58 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 - `npm run db:push` - Push database schema changes
 - `npm run db:studio` - Open Prisma Studio
 
-## Testing
+## Database & Prisma
+
+- The app uses PostgreSQL via the `DATABASE_URL` in environment variables. Prisma models are defined in `prisma/schema.prisma`.
+- Prisma Client is created once in `src/lib/prisma.ts` and reused across requests.
+- Tables include `Image`, `Vote`, `User`, `Stat`, `Leaderboard`, and `ViewedImage` for per-session viewed tracking.
+- Regenerate client after schema changes:
 
 ```bash
-# Run all tests
-npm test
+npx prisma generate
+```
 
-# Run tests in watch mode
-npm run test:watch
+- Run migrations against your database:
 
-# Run E2E tests
-npm run test:e2e
+```bash
+npx prisma migrate deploy
+```
+
+### Viewed images tracking
+
+- Per-session views are stored in `ViewedImage` with a unique `(sessionId, imageId)`.
+- `DatabaseService.markImageAsViewed` uses `upsert` to record views.
+- `DatabaseService.getRandomImage` selects unviewed images when a `x-session-id` header is provided.
+- If all images are viewed, a throttle guard (5 minutes) prevents repeated repopulations.
+
+## Image sources and domains
+
+- Real images are fetched from Unsplash, then Pexels, then Picsum fallback when keys are missing or responses are non-OK.
+- AI images are fetched from Midjourney Explore and Stability AI gallery (if `STABILITY_API_KEY` is set), then placeholders (Replicate/Leonardo) and in-memory mocks as last resort.
+- Non-OK responses (403/404, etc.) are treated as soft failures and skipped; fallbacks supply images.
+- Remote domains allowed in `next.config.ts`:
+  - `images.unsplash.com`, `images.pexels.com`, `picsum.photos`, `cdn.midjourney.com`, `mage.space`, `*.mage.space`, `replicate.delivery`, `pbxt.replicate.delivery`.
+
+### Environment variables
+
+- `DATABASE_URL` (Postgres)
+- `UNSPLASH_ACCESS_KEY` or `NEXT_PUBLIC_UNSPLASH_ACCESS_KEY` (optional)
+- `PEXELS_API_KEY` (optional)
+- `STABILITY_API_KEY` or `STABILITY_API_TOKEN` (optional)
+- `REPLICATE_API_TOKEN`, `LEONARDO_API_KEY` (optional)
+
+## Testing
+
+- API smoke test:
+
+```bash
+curl -s http://localhost:3005/api/images/random -H 'x-session-id: test-session-1'
+```
+
+- Unit tests:
+
+```bash
+node --test tests/imageSelection.test.cjs
 ```
 
 ## Deployment
@@ -168,11 +224,13 @@ The application will automatically deploy on push to the main branch.
 ### Manual Deployment
 
 1. Build the application:
+
 ```bash
 npm run build
 ```
 
 2. Start the production server:
+
 ```bash
 npm start
 ```
@@ -180,26 +238,31 @@ npm start
 ## Implementation Phases
 
 ### Phase 1: Foundation & MVP (Weeks 1-2)
+
 - Basic game interface
 - Static data flow
 - Mobile responsiveness
 
 ### Phase 2: Backend Integration (Weeks 3-4)
+
 - Database setup
 - API development
 - External image integration
 
 ### Phase 3: Advanced Features (Weeks 5-6)
+
 - Statistics and analytics
 - Leaderboard system
 - Social sharing
 
 ### Phase 4: Monetization & Polish (Weeks 7-8)
+
 - Ad integration
 - Enhanced UX
 - Testing and QA
 
 ### Phase 5: Post-Launch (Week 9+)
+
 - Monitoring and optimization
 - Feature expansion
 - Scaling
