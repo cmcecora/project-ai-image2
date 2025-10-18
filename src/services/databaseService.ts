@@ -5,6 +5,8 @@ import { GameImage } from '@/types/game';
 import crypto from 'crypto';
 
 export class DatabaseService {
+  // Throttle guard to avoid repeated repopulation loops across rapid requests
+  private static lastPopulateTimestampMs: number = 0;
   /**
    * Generate a cryptographically secure random number between 0 and 1
    */
@@ -94,23 +96,30 @@ export class DatabaseService {
 
   /**
    * Get unviewed images for a session
+   * Returns null if there's an error (to distinguish from 0 unviewed images)
    */
-  async getUnviewedImagesCount(sessionId: string): Promise<number> {
+  async getUnviewedImagesCount(sessionId: string): Promise<number | null> {
     try {
-      const totalImages = await prisma.image.count();
-      const viewedCount = await prisma.viewedImage.count({
+      const viewedImageIds = await prisma.viewedImage.findMany({
         where: { sessionId },
+        select: { imageId: true },
       });
-      return totalImages - viewedCount;
+      const viewedIds = viewedImageIds.map((v: { imageId: string }) => v.imageId);
+
+      const unviewedCount = await prisma.image.count({
+        where: viewedIds.length > 0 ? { id: { notIn: viewedIds } } : {},
+      });
+      return Math.max(0, unviewedCount);
     } catch (error) {
       console.error('Error getting unviewed images count:', error);
-      return 0;
+      // Return null to indicate error, not 0 (which means "all viewed")
+      return null;
     }
   }
 
   /**
    * Get a random unviewed image from the database with truly random selection
-   * If all images have been viewed, automatically populate more images
+   * Only populates new images when user has genuinely seen all available images
    */
   async getRandomImage(sessionId?: string): Promise<GameImage | null> {
     try {
@@ -124,11 +133,30 @@ export class DatabaseService {
         // Check if all images have been viewed
         const unviewedCount = await this.getUnviewedImagesCount(sessionId);
 
-        if (unviewedCount === 0) {
-          console.log('All images have been viewed. Populating more images...');
-          await this.populateImages(50);
+        // If error occurred (null), fall back to fetching all images without tracking
+        if (unviewedCount === null) {
+          console.warn('Could not get unviewed count, fetching all images');
+          imagePool = await prisma.image.findMany({
+            select: {
+              id: true,
+              url: true,
+              source: true,
+              type: true,
+              metadata: true,
+            },
+          });
+        } else if (unviewedCount === 0) {
+          // User has truly seen all images - populate more
+          const now = Date.now();
+          const shouldPopulate = now - DatabaseService.lastPopulateTimestampMs > 5 * 60 * 1000; // 5 minutes
 
-          // Fetch all images after population
+          if (shouldPopulate && totalCount > 0) {
+            console.log(`User has viewed all ${totalCount} images. Populating more...`);
+            await this.populateImages(50);
+            DatabaseService.lastPopulateTimestampMs = now;
+          }
+
+          // Fetch all images after potential population
           imagePool = await prisma.image.findMany({
             select: {
               id: true,

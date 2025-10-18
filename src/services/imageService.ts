@@ -46,7 +46,8 @@ export class ImageService {
       });
 
       if (!response.ok) {
-        throw new Error(`Unsplash API error: ${response.status}`);
+        console.warn(`Unsplash API request non-OK: ${response.status}`)
+        return []
       }
 
       interface UnsplashPhoto {
@@ -74,7 +75,7 @@ export class ImageService {
           photographer: photo.user.name,
         }));
     } catch (error) {
-      console.error('Error fetching images from Unsplash:', error);
+      console.warn('Error fetching images from Unsplash:', error);
       return [];
     }
   }
@@ -99,7 +100,8 @@ export class ImageService {
       });
 
       if (!response.ok) {
-        throw new Error(`Pexels API error: ${response.status}`);
+        console.warn(`Pexels API request non-OK: ${response.status}`)
+        return []
       }
 
       interface PexelsPhoto {
@@ -129,7 +131,7 @@ export class ImageService {
           photographer: photo.photographer,
         }));
     } catch (error) {
-      console.error('Error fetching images from Pexels:', error);
+      console.warn('Error fetching images from Pexels:', error);
       return [];
     }
   }
@@ -147,7 +149,8 @@ export class ImageService {
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`Picsum API error: ${response.status}`);
+        console.warn(`Picsum API request non-OK: ${response.status}`)
+        return []
       }
 
       interface PicsumPhoto {
@@ -167,7 +170,7 @@ export class ImageService {
         photographer: photo.author,
       }));
     } catch (error) {
-      console.error('Error fetching fallback real images from Picsum:', error);
+      console.warn('Error fetching fallback real images from Picsum:', error);
       return [];
     }
   }
@@ -255,7 +258,8 @@ export class ImageService {
       });
 
       if (!response.ok) {
-        throw new Error(`Midjourney Explore request failed with status ${response.status}`);
+        console.warn(`Midjourney Explore request non-OK: ${response.status}`)
+        return []
       }
 
       const html = await response.text();
@@ -283,7 +287,7 @@ export class ImageService {
         }
       });
     } catch (error) {
-      console.error('Error fetching Midjourney images:', error);
+      console.warn('Error fetching Midjourney images:', error);
       return [];
     }
   }
@@ -313,7 +317,8 @@ export class ImageService {
       });
 
       if (!response.ok) {
-        throw new Error(`Stability AI gallery request failed with status ${response.status}`);
+        console.warn(`Stability AI gallery request non-OK: ${response.status}`)
+        return []
       }
 
       interface StabilityGalleryCreator {
@@ -355,7 +360,7 @@ export class ImageService {
           }
         });
     } catch (error) {
-      console.error('Error fetching Stable Diffusion images:', error);
+      console.warn('Error fetching Stable Diffusion images:', error);
       return [];
     }
   }
