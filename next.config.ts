@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Help Next resolve project root correctly in multi-lockfile environments
+  experimental: {
+    outputFileTracingRoot: process.cwd(),
+  },
   images: {
     formats: ['image/webp', 'image/avif'],
     remotePatterns: [

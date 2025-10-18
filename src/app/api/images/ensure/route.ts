@@ -1,6 +1,14 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Type for image metadata
+interface ImageMetadata {
+  photographer?: string;
+  model?: string;
+  credits?: string;
+  [key: string]: unknown;
+}
+
 // POST /api/images/ensure
 // Ensures an image exists in the DB by URL, returning a DB-backed GameImage
 export async function POST(req: NextRequest) {
@@ -37,23 +45,16 @@ export async function POST(req: NextRequest) {
           select: { id: true, url: true, source: true, type: true, metadata: true },
         });
 
+    const metadata = record.metadata as ImageMetadata | null;
+    
     const responsePayload = {
       id: record.id,
       url: record.url,
       isAI: record.type === 'ai',
       source: record.source,
-      photographer:
-        record.metadata && typeof record.metadata === 'object' && 'photographer' in record.metadata
-          ? (record.metadata as any).photographer
-          : undefined,
-      model:
-        record.metadata && typeof record.metadata === 'object' && 'model' in record.metadata
-          ? (record.metadata as any).model
-          : undefined,
-      credits:
-        record.metadata && typeof record.metadata === 'object' && 'credits' in record.metadata
-          ? (record.metadata as any).credits
-          : undefined,
+      photographer: metadata?.photographer,
+      model: metadata?.model,
+      credits: metadata?.credits,
     };
 
     return new Response(JSON.stringify(responsePayload), {

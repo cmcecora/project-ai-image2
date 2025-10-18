@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import { motion } from "framer-motion"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { GameImage } from "@/types/game"
@@ -42,10 +43,10 @@ export function ImageCard({ image, isLoading }: ImageCardProps) {
       const vh = window.innerHeight
       const vw = window.innerWidth
 
-      // Account for UI elements (header, buttons, score display)
-      // Roughly 40vh for other elements (header: 10vh, score: 10vh, buttons/results: 20vh)
-      const availableHeight = vh * 0.5 // Use 50% of viewport height for image
-      const maxWidth = Math.min(vw * 0.9, 800) // Max 90% viewport width or 800px
+      // Account for UI elements (header, buttons, score display, ads)
+      // More conservative sizing to ensure buttons fit above fold
+      const availableHeight = vh * 0.35 // Use 35% of viewport height for image
+      const maxWidth = Math.min(vw * 0.85, 600) // Max 85% viewport width or 600px
 
       // Keep aspect ratio 1:1 (square)
       const size = Math.min(availableHeight, maxWidth)
@@ -67,8 +68,8 @@ export function ImageCard({ image, isLoading }: ImageCardProps) {
           style={{
             width: `${dimensions.width}px`,
             height: `${dimensions.height}px`,
-            maxWidth: "min(90vw, 800px)",
-            maxHeight: "50vh",
+            maxWidth: "min(85vw, 600px)",
+            maxHeight: "35vh",
           }}
         >
           <Skeleton className="h-full w-full" />
@@ -78,14 +79,20 @@ export function ImageCard({ image, isLoading }: ImageCardProps) {
   }
 
   return (
-    <div className="flex items-center justify-center">
+    <motion.div
+      className="flex items-center justify-center"
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+    >
       <Card
         className="relative overflow-hidden bg-gray-100 shadow-xl"
         style={{
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
-          maxWidth: "min(90vw, 800px)",
-          maxHeight: "50vh",
+          maxWidth: "min(85vw, 600px)",
+          maxHeight: "35vh",
         }}
       >
         {imageLoading && !imageError && (
@@ -135,6 +142,6 @@ export function ImageCard({ image, isLoading }: ImageCardProps) {
           />
         )}
       </Card>
-    </div>
+    </motion.div>
   )
 }

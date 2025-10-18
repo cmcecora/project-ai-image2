@@ -11,13 +11,15 @@ import { mockImages } from "@/data/mockImages"
 import { useUserStats } from "@/hooks/useLocalStorage"
 import { useGameSession } from "@/hooks/useGameSession"
 import { useGameSwipe } from "@/hooks/useSwipeGesture"
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
 import { imageApiService } from "@/services/imageApiService"
 import { voteService } from "@/services/voteService"
 import { selectUnseenImage } from "@/lib/imageSelection"
+import { hapticSuccess, hapticError, hapticLight } from "@/lib/haptics"
 
 export function GameContainer() {
   const { stats: savedStats, updateStats } = useUserStats()
-  const { session, markImageAsSeen, getSeenLists, hasSeenImage } = useGameSession()
+  const { markImageAsSeen, getSeenLists, hasSeenImage } = useGameSession()
   const hasInitialized = useRef(false)
 
   const [gameState, setGameState] = useState<GameState>({
@@ -112,12 +114,22 @@ export function GameContainer() {
   const handleChoice = async (isAI: boolean) => {
     if (!gameState.currentImage || gameState.showResults) return
 
+    // Haptic feedback for button press
+    hapticLight()
+
     const isCorrect = isAI === gameState.currentImage.isAI
     const newScore = isCorrect ? gameState.score + 1 : gameState.score
     const newStreak = isCorrect ? gameState.streak + 1 : 0
     const newTotalPlayed = gameState.totalPlayed + 1
     const currentImage = gameState.currentImage
     const currentImageId = currentImage.id
+
+    // Haptic feedback based on result
+    if (isCorrect) {
+      hapticSuccess()
+    } else {
+      hapticError()
+    }
 
     // Mark image as seen in this session IMMEDIATELY
     markImageAsSeen(currentImageId, currentImage.url)
@@ -177,29 +189,42 @@ export function GameContainer() {
     enabled: !gameState.isLoading && !gameState.showResults && !!gameState.currentImage,
   })
 
+  // Keyboard shortcuts
+  useKeyboardShortcuts(
+    {
+      onY: () => !gameState.showResults && handleChoice(true), // Y = Yes (AI)
+      onN: () => !gameState.showResults && handleChoice(false), // N = No (Real)
+      onRightArrow: () => !gameState.showResults && handleChoice(true), // Right = AI
+      onLeftArrow: () => !gameState.showResults && handleChoice(false), // Left = Real
+      onEnter: () => gameState.showResults && handleNext(), // Enter = Next
+      onSpace: () => gameState.showResults && handleNext(), // Space = Next
+    },
+    !gameState.isLoading && !!gameState.currentImage
+  )
+
   return (
     <div
-      className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-4"
+      className="mx-auto flex max-w-6xl flex-col px-4 py-2"
       {...swipeHandlers}
-      style={{ height: "100vh", maxHeight: "100vh", overflow: "auto" }}
+      style={{ height: "calc(100vh - 120px)", maxHeight: "calc(100vh - 120px)", overflow: "auto" }}
     >
       {/* Compact Header */}
-      <div className="mb-4 text-center">
+      <div className="mb-2 text-center">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-2xl font-bold text-transparent md:text-3xl lg:text-4xl"
+          className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-xl font-bold text-transparent md:text-2xl lg:text-3xl"
         >
           Is This Photo AI?
         </motion.h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-xs text-muted-foreground">
           Can you tell the difference?
           <span className="md:hidden"> • Swipe right for AI, left for Real</span>
         </p>
       </div>
 
       {/* Compact Score Display */}
-      <div className="mb-4">
+      <div className="mb-2">
         <ScoreDisplay
           score={gameState.score}
           totalPlayed={gameState.totalPlayed}
@@ -208,7 +233,7 @@ export function GameContainer() {
       </div>
 
       {/* Image Card - Main Focus */}
-      <div className="mb-4 flex flex-shrink-0 flex-col items-center">
+      <div className="mb-2 flex flex-shrink-0 flex-col items-center">
         <motion.div
           drag={!gameState.showResults && !gameState.isLoading ? "x" : false}
           dragConstraints={{ left: 0, right: 0 }}
@@ -218,7 +243,7 @@ export function GameContainer() {
         </motion.div>
 
         {/* Game Controls - Positioned directly below image */}
-        <div className="mt-4 w-full" style={{ maxWidth: "min(90vw, 800px)" }}>
+        <div className="mt-2 w-full" style={{ maxWidth: "min(90vw, 800px)" }}>
           <AnimatePresence mode="wait">
             {!gameState.showResults ? (
               <motion.div
@@ -245,7 +270,6 @@ export function GameContainer() {
                   <ResultsOverlay
                     image={gameState.currentImage}
                     isCorrect={gameState.isCorrect!}
-                    userChoice={gameState.lastChoice!}
                     onNext={handleNext}
                   />
                 </motion.div>

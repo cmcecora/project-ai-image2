@@ -10,44 +10,38 @@ interface StatisticsChartProps {
 
 const COLORS = ["#8884d8", "#82ca9d"]
 
+const RADIAN = Math.PI / 180
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const renderCustomizedLabel = (props: any) => {
+  const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props
+  if (
+    typeof cx !== "number" ||
+    typeof cy !== "number" ||
+    typeof midAngle !== "number" ||
+    typeof innerRadius !== "number" ||
+    typeof outerRadius !== "number" ||
+    typeof percent !== "number"
+  ) {
+    return null
+  }
+
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? "start" : "end"} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  )
+}
+
 export function StatisticsChart({ stats }: StatisticsChartProps) {
   const data = [
     { name: "AI Generated", value: stats.aiVotes },
     { name: "Real Photo", value: stats.realVotes },
   ]
-
-  const RADIAN = Math.PI / 180
-  const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-  }: {
-    cx: number
-    cy: number
-    midAngle: number
-    innerRadius: number
-    outerRadius: number
-    percent: number
-  }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
-    const x = cx + radius * Math.cos(-midAngle * RADIAN)
-    const y = cy + radius * Math.sin(-midAngle * RADIAN)
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    )
-  }
 
   return (
     <div className="h-64 w-full">

@@ -4,6 +4,20 @@ import { imageService } from './imageService';
 import { GameImage } from '@/types/game';
 import crypto from 'crypto';
 
+// Type for image metadata
+interface ImageMetadata {
+  photographer?: string;
+  model?: string;
+  credits?: string;
+  [key: string]: unknown;
+}
+
+// Type for Prisma where clause
+interface ImageWhereClause {
+  id?: { notIn: string[] };
+  url?: { notIn: string[] };
+}
+
 export class DatabaseService {
   // Throttle guard to avoid repeated repopulation loops across rapid requests
   private static lastPopulateTimestampMs: number = 0;
@@ -244,12 +258,12 @@ export class DatabaseService {
    */
   async getRandomImageExcluding(excludeIds: string[], excludeUrls: string[] = []): Promise<GameImage | null> {
     try {
-      const whereClause: Record<string, unknown> = {};
+      const whereClause: ImageWhereClause = {};
       if (excludeIds.length > 0) {
-        (whereClause as any).id = { notIn: excludeIds };
+        whereClause.id = { notIn: excludeIds };
       }
       if (excludeUrls.length > 0) {
-        (whereClause as any).url = { notIn: excludeUrls };
+        whereClause.url = { notIn: excludeUrls };
       }
       const count = await prisma.image.count({ where: whereClause });
       if (count === 0) return null;
@@ -271,20 +285,16 @@ export class DatabaseService {
       const image = imageList[0];
       if (!image) return null;
 
+      const metadata = image.metadata as ImageMetadata | null;
+
       return {
         id: image.id,
         url: image.url,
         isAI: image.type === 'ai',
         source: image.source,
-        photographer: image.metadata && typeof image.metadata === 'object' && 'photographer' in image.metadata
-          ? (image.metadata as any).photographer
-          : undefined,
-        model: image.metadata && typeof image.metadata === 'object' && 'model' in image.metadata
-          ? (image.metadata as any).model
-          : undefined,
-        credits: image.metadata && typeof image.metadata === 'object' && 'credits' in image.metadata
-          ? (image.metadata as any).credits
-          : undefined,
+        photographer: metadata?.photographer,
+        model: metadata?.model,
+        credits: metadata?.credits,
       };
     } catch (error) {
       console.error('Error getting random image excluding list:', error);
