@@ -15,14 +15,37 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Create the vote
-    const vote = await prisma.vote.create({
-      data: {
-        imageId,
-        userId: userId || null, // Allow null userId for anonymous votes
-        choice,
-      },
-    });
+    // If a userId is provided, ensure the user exists to avoid FK errors
+    let ensuredUserId: string | null = null;
+    if (userId && typeof userId === 'string') {
+      const defaultUsername = `User_${userId.substring(0, 8)}`;
+      const user = await prisma.user.upsert({
+        where: { id: userId },
+        update: {},
+        create: {
+          id: userId,
+          username: defaultUsername,
+        },
+        select: { id: true },
+      });
+      ensuredUserId = user.id;
+    }
+
+    // Insert or update the vote
+    let vote;
+    if (ensuredUserId) {
+      // For identified users, prevent duplicate votes per image by upserting on the composite unique key
+      vote = await prisma.vote.upsert({
+        where: { imageId_userId: { imageId, userId: ensuredUserId } },
+        update: { choice },
+        create: { imageId, userId: ensuredUserId, choice },
+      });
+    } else {
+      // Anonymous votes (no userId) cannot use the composite unique index; create a new vote
+      vote = await prisma.vote.create({
+        data: { imageId, userId: null, choice },
+      });
+    }
 
     // Update the stats for the image
     await updateImageStats(imageId);

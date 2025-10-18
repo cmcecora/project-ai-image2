@@ -32,13 +32,16 @@ export class ImageApiService {
   }
 
   /**
-   * Fetch a random image from the API with session tracking
+   * Fetch a random image from the API with optional exclude lists
    */
-  async getRandomImage(): Promise<GameImage | null> {
+  async getRandomImage(excludeIds: string[] = [], excludeUrls: string[] = []): Promise<GameImage | null> {
     try {
       const sessionId = this.getSessionId();
 
+      // The API currently supports GET with an X-Session-Id header.
+      // Exclude lists are handled server-side via session tracking.
       const response = await fetch('/api/images/random', {
+        method: 'GET',
         headers: {
           'X-Session-Id': sessionId,
         },
@@ -51,17 +54,38 @@ export class ImageApiService {
         throw new Error(`Failed to fetch random image: ${response.status}`);
       }
 
-      // Update session ID from response if provided
-      const returnedSessionId = response.headers.get('X-Session-Id');
-      if (returnedSessionId && typeof window !== 'undefined') {
-        this.sessionId = returnedSessionId;
-        localStorage.setItem('game-session-id', returnedSessionId);
-      }
-
       const data = await response.json();
-      return data;
+      return data as GameImage;
     } catch (error) {
       console.error('Error fetching random image:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Ensure an image with this URL exists in the DB; returns DB-backed GameImage
+   */
+  async ensureImageByUrl(image: GameImage): Promise<GameImage | null> {
+    try {
+      const response = await fetch('/api/images/ensure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: image.url,
+          isAI: image.isAI,
+          source: image.source,
+          photographer: image.photographer,
+          model: image.model,
+          credits: image.credits,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to ensure image: ${response.status}`);
+      }
+      const data = await response.json();
+      return data as GameImage;
+    } catch (error) {
+      console.error('Error ensuring image by URL:', error);
       return null;
     }
   }

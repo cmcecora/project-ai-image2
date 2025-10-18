@@ -190,15 +190,18 @@ export class ImageService {
       // This is a simplified approach - in reality, you'd call:
       // const prediction = await this.replicate.predictions.create({...});
       
-      // Return placeholder images
-      return Array(params.count || 5).fill(null).map((_, index) => ({
-        id: `replicate_${Date.now()}_${index}`,
-        url: `https://source.unsplash.com/800x800/?ai-generated,art,${index}`,
-        isAI: true,
-        source: 'Replicate',
-        credits: 'AI Generated',
-        model: 'Replicate Model',
-      }));
+      // Return placeholder images using picsum (stable, allowed domain)
+      return Array(params.count || 5).fill(null).map((_, index) => {
+        const seed = `replicate_${Date.now()}_${index}`;
+        return {
+          id: seed,
+          url: `https://picsum.photos/seed/${seed}/800/800`,
+          isAI: true,
+          source: 'Replicate (placeholder)',
+          credits: 'AI Generated',
+          model: 'Replicate Model',
+        };
+      });
     } catch (error) {
       console.error('Error with Replicate service:', error);
       return [];
@@ -216,15 +219,18 @@ export class ImageService {
 
     try {
       // In a real implementation, you'd call the Leonardo API to generate images
-      // For now, we'll return placeholder images
-      return Array(params.count || 5).fill(null).map((_, index) => ({
-        id: `leonardo_${Date.now()}_${index}`,
-        url: `https://source.unsplash.com/800x800/?digital-art,${index}`,
-        isAI: true,
-        source: 'Leonardo',
-        credits: 'AI Generated',
-        model: 'Leonardo AI',
-      }));
+      // For now, we'll return placeholder images using picsum
+      return Array(params.count || 5).fill(null).map((_, index) => {
+        const seed = `leonardo_${Date.now()}_${index}`;
+        return {
+          id: seed,
+          url: `https://picsum.photos/seed/${seed}/800/800`,
+          isAI: true,
+          source: 'Leonardo (placeholder)',
+          credits: 'AI Generated',
+          model: 'Leonardo AI',
+        };
+      });
     } catch (error) {
       console.error('Error with Leonardo service:', error);
       return [];

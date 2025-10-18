@@ -10,12 +10,11 @@ interface ChoiceButtonsProps {
 
 export function ChoiceButtons({ onChoice, disabled }: ChoiceButtonsProps) {
   return (
-    <div className="flex gap-2 w-full">
+    <div className="flex w-full gap-3">
       <Button
         onClick={() => onChoice(true)}
         disabled={disabled}
-        size="xl"
-        className="flex-1 flex items-center justify-center gap-2 border-2 border-green-500 bg-green-500/10 hover:bg-green-500/20 text-green-700 hover:border-green-600 font-bold text-lg transition-colors"
+        className="flex h-14 flex-1 items-center justify-center gap-2 border-2 border-green-500 bg-green-500/10 text-lg font-bold text-green-700 transition-all hover:border-green-600 hover:bg-green-500/20 disabled:opacity-50"
       >
         <Check className="h-6 w-6" />
         <span>YES!</span>
@@ -23,8 +22,7 @@ export function ChoiceButtons({ onChoice, disabled }: ChoiceButtonsProps) {
       <Button
         onClick={() => onChoice(false)}
         disabled={disabled}
-        size="xl"
-        className="flex-1 flex items-center justify-center gap-2 border-2 border-red-500 bg-red-500/10 hover:bg-red-500/20 text-red-700 hover:border-red-600 font-bold text-lg transition-colors"
+        className="flex h-14 flex-1 items-center justify-center gap-2 border-2 border-red-500 bg-red-500/10 text-lg font-bold text-red-700 transition-all hover:border-red-600 hover:bg-red-500/20 disabled:opacity-50"
       >
         <X className="h-6 w-6" />
         <span>NO</span>
