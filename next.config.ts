@@ -27,21 +27,22 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'resize.mage.space',
-      },
-      {
-        protocol: 'https',
         hostname: 'mage.space',
       },
       {
         protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
+        hostname: '*.mage.space',
       },
       {
         protocol: 'https',
-        hostname: 'cloudflare.com',
+        hostname: 'replicate.delivery',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pbxt.replicate.delivery',
       },
     ],
+    unoptimized: false,
   },
 };
 

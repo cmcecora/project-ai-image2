@@ -25,7 +25,16 @@ function isImageUrl(url: string): boolean {
 
 export function ImageCard({ image, isLoading }: ImageCardProps) {
   const [imageLoading, setImageLoading] = useState(true)
+  const [imageError, setImageError] = useState(false)
+  const [fallbackSrc, setFallbackSrc] = useState<string | null>(null)
   const [dimensions, setDimensions] = useState({ width: 400, height: 400 })
+
+  // Reset loading state when image changes
+  useEffect(() => {
+    setImageLoading(true)
+    setImageError(false)
+    setFallbackSrc(null)
+  }, [image?.url])
 
   useEffect(() => {
     const calculateDimensions = () => {
@@ -79,36 +88,50 @@ export function ImageCard({ image, isLoading }: ImageCardProps) {
           maxHeight: "50vh",
         }}
       >
-        {imageLoading && (
-          <div className="absolute inset-0 z-10">
-            <Skeleton className="h-full w-full" />
+        {imageLoading && !imageError && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-100">
+            <div className="text-center">
+              <Skeleton className="h-full w-full" />
+              <p className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+                Loading image...
+              </p>
+            </div>
           </div>
         )}
-
-        {/* Render video if URL is a video */}
-        {isVideoUrl(image.url) ? (
-          <video
-            src={image.url}
-            className="h-full w-full object-contain"
-            autoPlay
-            loop
-            muted
-            playsInline
-            onLoadedData={() => setImageLoading(false)}
-            onError={() => setImageLoading(false)}
-          />
-        ) : (
-          /* Render image if URL is an image */
+        {imageError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 p-8 text-center">
+            <div>
+              <p className="mb-2 text-sm text-red-500">Failed to load image</p>
+              <p className="text-xs text-gray-500">
+                This might be a temporary issue. Try the next image.
+              </p>
+            </div>
+          </div>
+        )}
+        {!imageError && (
           <Image
-            src={image.url}
+            src={fallbackSrc || image.url}
             alt="Can you tell if this image is AI generated?"
             fill
             sizes="(max-width: 768px) 90vw, (max-width: 1200px) 70vw, 800px"
             className="object-contain"
             priority
             unoptimized
-            onLoad={() => setImageLoading(false)}
-            onError={() => setImageLoading(false)}
+            onLoad={() => {
+              setImageLoading(false)
+              setImageError(false)
+            }}
+            onError={(e) => {
+              console.error("Image failed to load:", image.url, e)
+              // Try a single retry with a stable placeholder if the original URL fails
+              if (!fallbackSrc) {
+                const seed = encodeURIComponent(image.url)
+                setFallbackSrc(`https://picsum.photos/seed/fallback-${seed}/800/800`)
+                return
+              }
+              setImageLoading(false)
+              setImageError(true)
+            }}
           />
         )}
       </Card>

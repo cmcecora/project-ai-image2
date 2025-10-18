@@ -210,6 +210,59 @@ export class DatabaseService {
       return null;
     }
   }
+
+  /**
+   * Get a random image excluding a list of image IDs
+   */
+  async getRandomImageExcluding(excludeIds: string[], excludeUrls: string[] = []): Promise<GameImage | null> {
+    try {
+      const whereClause: Record<string, unknown> = {};
+      if (excludeIds.length > 0) {
+        (whereClause as any).id = { notIn: excludeIds };
+      }
+      if (excludeUrls.length > 0) {
+        (whereClause as any).url = { notIn: excludeUrls };
+      }
+      const count = await prisma.image.count({ where: whereClause });
+      if (count === 0) return null;
+
+      const randomOffset = Math.floor(Math.random() * count);
+      const imageList = await prisma.image.findMany({
+        where: whereClause,
+        skip: randomOffset,
+        take: 1,
+        select: {
+          id: true,
+          url: true,
+          source: true,
+          type: true,
+          metadata: true,
+        },
+      });
+
+      const image = imageList[0];
+      if (!image) return null;
+
+      return {
+        id: image.id,
+        url: image.url,
+        isAI: image.type === 'ai',
+        source: image.source,
+        photographer: image.metadata && typeof image.metadata === 'object' && 'photographer' in image.metadata
+          ? (image.metadata as any).photographer
+          : undefined,
+        model: image.metadata && typeof image.metadata === 'object' && 'model' in image.metadata
+          ? (image.metadata as any).model
+          : undefined,
+        credits: image.metadata && typeof image.metadata === 'object' && 'credits' in image.metadata
+          ? (image.metadata as any).credits
+          : undefined,
+      };
+    } catch (error) {
+      console.error('Error getting random image excluding list:', error);
+      return null;
+    }
+  }
 }
 
 export const databaseService = new DatabaseService();
