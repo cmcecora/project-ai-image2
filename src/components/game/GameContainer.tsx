@@ -6,6 +6,7 @@ import { ImageCard } from "./ImageCard"
 import { ChoiceButtons } from "./ChoiceButtons"
 import { ScoreDisplay } from "./ScoreDisplay"
 import { ResultsOverlay } from "./ResultsOverlay"
+import { AdSlot } from "@/components/ads/AdSlot"
 import { GameState, GameImage } from "@/types/game"
 import { mockImages } from "@/data/mockImages"
 import { useUserStats } from "@/hooks/useLocalStorage"
@@ -183,30 +184,6 @@ export function GameContainer() {
       {...swipeHandlers}
       style={{ height: "100vh", maxHeight: "100vh", overflow: "auto" }}
     >
-      {/* Compact Header */}
-      <div className="mb-4 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-2xl font-bold text-transparent md:text-3xl lg:text-4xl"
-        >
-          Is This Photo AI?
-        </motion.h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Can you tell the difference?
-          <span className="md:hidden"> • Swipe right for AI, left for Real</span>
-        </p>
-      </div>
-
-      {/* Compact Score Display */}
-      <div className="mb-4">
-        <ScoreDisplay
-          score={gameState.score}
-          totalPlayed={gameState.totalPlayed}
-          streak={gameState.streak}
-        />
-      </div>
-
       {/* Image Card - Main Focus */}
       <div className="mb-4 flex flex-shrink-0 flex-col items-center">
         <motion.div
@@ -253,6 +230,25 @@ export function GameContainer() {
             )}
           </AnimatePresence>
         </div>
+
+        {/* Bottom ad positioned directly under controls */}
+        <div className="mt-4 w-full" style={{ maxWidth: "min(90vw, 800px)" }}>
+          <AdSlot
+            slot="bottom"
+            src="/mockimg/ad4horiz.gif"
+            alt="Join the creative community"
+            className="mx-auto"
+          />
+        </div>
+      </div>
+
+      {/* Score Display (moved below image and controls) */}
+      <div className="mt-4">
+        <ScoreDisplay
+          score={gameState.score}
+          totalPlayed={gameState.totalPlayed}
+          streak={gameState.streak}
+        />
       </div>
     </div>
   )

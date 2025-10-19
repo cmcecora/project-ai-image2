@@ -13,6 +13,7 @@ import { StatisticsChart } from "./StatisticsChart"
 interface ResultsOverlayProps {
   image: GameImage
   isCorrect: boolean
+  userChoice: boolean
   onNext: () => void
 }
 
